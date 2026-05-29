@@ -1,0 +1,74 @@
+Tarea 3 - Actuadores
+
+Ejercicio 1: El Lanzador (SparkMax + NEO, reduccion 3:1)
+
+
+Pregunta 1 -  (velocidad real de la llanta en RPS):
+
+    Motor: 3000 RPM
+    Reduccion: 3:1   llanta RPM = 3000 / 3 = 1000 RPM
+    Conversion a RPS:    1000 RPM / 60 = 16.67 RPS
+
+    La llanta gira a 16.67 RPS.
+
+
+Pregunta 2 - velocityConversionFactor:
+
+    El metodo getVelocity()  del SparkMax entrega RPM del eje del motor 
+    -- RPS del eje de salida (la llanta).
+
+    Operacion:
+        velocidad_llanta_RPS = velocidad_motor_RPM * (1 / reduccion) * (1 min / 60 s)
+        velocidad_llanta_RPS = velocidad_motor_RPM * (1 / 3) * (1 / 60)
+        velocidad_llanta_RPS = velocidad_motor_RPM * (1 / 180)
+
+    Valor exacto a poner:
+        config.encoder.velocityConversionFactor(1.0 / 180.0)
+
+    Con este factor, getVelocity() devuelve directamente RPS de la llanta.
+
+
+Pregunta 3 - Leer el voltaje real aplicado a las bobinas:
+
+    inputs.appliedVolts = m_motor.getAppliedOutput() * m_motor.getBusVoltage();
+
+    - getAppliedOutput(): ciclo de trabajo actual del motor (valor de -1.0 a 1.0)
+    - getBusVoltage():    voltaje del bus CAN / bateria en ese instante
+    - Producto:          voltaje real que llega a las bobinas del NEO
+
+
+
+Ejercicio 2: El Brazo Articulado (TalonFX / Kraken X60, reduccion 75:1)
+
+Pregunta 1 - SensorToMechanismRatio:
+
+    talonFXConfigs.Feedback.SensorToMechanismRatio = 75.0;
+
+    Este campo le indica a CTRE que por cada vuelta del mecanismo (brazo),
+el sensor interno del motor registra 75 vueltas. Phoenix 6 aplica este
+    ratio automaticamente, de modo que getPosition() y getVelocity() ya
+    entregan unidades del mecanismo, no del motor.
+
+
+Pregunta 2 - Convertir rotaciones a grados:
+
+    CTRE entrega la posicion en ROTACIONES del mecanismo (despues de aplicar
+    SensorToMechanismRatio). 1 rotacion = 360 grados.
+
+    Constante necesaria:
+        private static final double ROTATIONS_TO_DEGREES = 360.0;
+
+    Linea para actualizar el input:
+        inputs.currentAngleDeg = m_motor.getPosition().getValueAsDouble() * ROTATIONS_TO_DEGREES;
+
+
+Pregunta 3 - Leer la corriente de estator (torque):
+
+  inputs.currentAmps = m_motor.getStatorCurrent().getValueAsDouble();
+
+    - getStatorCurrent(): devuelve un StatusSignal<Current> con los Amperes
+      que fluyen por las bobinas del estator.
+    - La corriente de estator es proporcional al torque 
+  del motor, por lo que es el indicador correcto para saber cuanta
+      fuerza esta haciendo el brazo contra la estructura.
+ - getValueAsDouble() extrae el valor numerico del StatusSignal.
