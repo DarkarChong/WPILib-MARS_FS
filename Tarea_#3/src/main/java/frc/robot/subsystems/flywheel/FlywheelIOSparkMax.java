@@ -9,7 +9,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class FlywheelIOSparkMax implements FlywheelIO {
 
-    private static final double VELOCITY_CONVERSION_FACTOR = 1.0 / 180.0;
+    private static final double VELOCITY_CONVERSION_FACTOR = 1.0 / 180.0; 
 
     private final SparkMax m_motor;
     private final RelativeEncoder m_encoder;
@@ -25,7 +25,7 @@ public class FlywheelIOSparkMax implements FlywheelIO {
     }
 
     @Override
-    public void updateInputs(FlywheelIOInputs inputs) {
+    public void updateInputs(FlywheelInputs inputs) {
         inputs.velocityRPS = m_encoder.getVelocity();
         inputs.appliedVolts = m_motor.getAppliedOutput() * m_motor.getBusVoltage();
         inputs.currentAmps = m_motor.getOutputCurrent();

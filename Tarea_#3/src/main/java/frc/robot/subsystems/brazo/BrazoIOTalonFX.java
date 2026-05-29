@@ -18,7 +18,7 @@ public class BrazoIOTalonFX implements BrazoIO {
     }
 
     @Override
-    public void updateInputs(BrazoIOInputs inputs) {
+    public void updateInputs(BrazoInputs inputs) {
         inputs.currentAngleDeg = m_motor.getPosition().getValueAsDouble() * ROTATIONS_TO_DEGREES;
         inputs.appliedVolts = m_motor.getMotorVoltage().getValueAsDouble();
         inputs.currentAmps = m_motor.getStatorCurrent().getValueAsDouble();
